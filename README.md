@@ -1,57 +1,62 @@
-<header>
+![preview Long Haul](/preview.jpg)
 
-<!--
-  <<< Author notes: Course header >>>
-  Include a 1280×640 image, course title in sentence case, and a concise description in emphasis.
-  In your repository settings: enable template repository, add your 1280×640 social image, auto delete head branches.
-  Add your open source license, GitHub uses MIT license.
--->
+Long Haul is a minimal jekyll theme built with SASS and focuses on long form blog posts. It is meant to be used as a starting point for a jekyll blog/website.
 
-# GitHub Pages
+If you really enjoy Long Haul and want to give me credit somewhere on the internet send or tweet out your experience with Long Haul and tag me [@brianmaierjr](https://twitter.com/brianmaierjr).
 
-_Create a site or blog from your GitHub repositories with GitHub Pages._
+#### [View Demo](http://brianmaierjr.com/long-haul)
 
-</header>
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bd29f13b-3754-46d7-9a39-48db2e174b99/deploy-status)](https://app.netlify.com/sites/long-haul/deploys)
 
-<!--
-  <<< Author notes: Finish >>>
-  Review what we learned, ask for feedback, provide next steps.
--->
+## Features
 
-## Finish
+-   Minimal, Type Focused Design
+-   Built with SASS
+-   SVG Social Icons
+-   Responsive Nav Menu
+-   XML Feed for RSS Readers
+-   Contact Form via Formspree
+-   5 Post Loop with excerpt on Home Page
+-   Previous / Next Post Navigation
+-   Estimated Reading Time for posts
+-   Stylish Drop Cap on posts
+-   A Better Type Scale for all devices
+-   Comments powered by Disqus
+-   [Dark Mode support](https://github.com/brianmaierjr/long-haul/blob/master/preview-dark.png) via [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
 
-_Congratulations friend, you've completed this course!_
+## Setup
 
-<img src=https://octodex.github.com/images/constructocat2.jpg alt=celebrate width=300 align=right>
+1. [Install Jekyll](http://jekyllrb.com)
+2. Fork the [Long Haul repo](http://github.com/brianmaierjr/long-haul)
+3. Clone it
+4. [Install Bundler](http://bundler.io/)
+5. Run `bundle install`
+6. Run Jekyll Serve and Watch command`bundle exec jekyll serve -w`
 
-Your blog is now live and has been deployed!
+## Site Settings
 
-Here's a recap of all the tasks you've accomplished in your repository:
+The main settings can be found inside the `_config.yml` file:
 
-- You enabled GitHub Pages.
-- You selected a theme using the config file.
-- You learned about proper directory format and file naming conventions in Jekyll.
-- You created your first blog post with Jekyll!
+-   **title:** title of your site
+-   **description:** description of your site
+-   **url:** your url
+-   **paginate:** the amount of posts displayed on homepage
+-   **navigation:** these are the links in the main site navigation
+-   **social** diverse social media usernames (optional)
+-   **google_analytics** Google Analytics key (optional)
 
-### What's next?
+### Header Option
 
-- Keep working on your GitHub Pages site... we love seeing what you come up with!
-- We'd love to hear what you thought of this course [in our discussion board](https://github.com/orgs/skills/discussions/categories/github-pages).
-- [Take another GitHub Skills course](https://github.com/skills).
-- [Read the GitHub Getting Started docs](https://docs.github.com/en/get-started).
-- To find projects to contribute to, check out [GitHub Explore](https://github.com/explore).
+If you'd like your header to be larger then you can use the option below in you `config.yml` to make it take up half of the vertical space on screens 800px wide and up. _Preview image below._
 
-<footer>
+-   **header:** large
 
-<!--
-  <<< Author notes: Footer >>>
-  Add a link to get support, GitHub status page, code of conduct, license link.
--->
+![preview Long Haul](/preview-large.png)
 
----
+## To use on GitHub Pages
 
-Get help: [Post in our discussion board](https://github.com/orgs/skills/discussions/categories/github-pages) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
+To use latest Jekyll and Jekyll Sass Converter on GitHub Pages, <a href="https://github.blog/changelog/2022-07-27-github-pages-custom-github-actions-workflows-beta/">you can now deploy to a GitHub Pages site using GitHub Actions.</a>
 
-&copy; 2023 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+## License
 
-</footer>
+This is [MIT](LICENSE) with no added caveats, so feel free to use this Jekyll theme on your site without linking back to me or using a disclaimer.
