@@ -1,7 +1,7 @@
 title: Warren Jacinto Blog
 description: Warren Jacinto aka DeadSpheroid's blog for all things code
 
-url: https://deadspheroid.github.io
+url: https://deadspheroid.github.io/
 # Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
 baseurl: # Ex: /project-page
 paginate_path: "blog/page:num/"
@@ -17,6 +17,7 @@ markdown: kramdown
 highlighter: rouge
 plugins: [jekyll-paginate]
 paginate: 5
+future: true
 
 navigation:
     - title: Home
