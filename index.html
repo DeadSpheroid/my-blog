@@ -6,7 +6,7 @@ title: Warren Jacinto Blog
 <div class="home" id="home">
 	<h1 class="pageTitle">Recent Posts</h1>
 	<div class="posts noList">
-		{%- for post in paginator.posts -%}
+		{%- for post in site.posts -%}
 		<article>
 			<span class="date">{{ post.date | date: '%B %d, %Y' }}</span>
 			<h3>
