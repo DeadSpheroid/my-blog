@@ -3,7 +3,7 @@ description: Warren Jacinto aka DeadSpheroid's blog for all things code
 
 url: https://deadspheroid.github.io/
 # Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
-baseurl: # Ex: /project-page
+baseurl: /my-blog
 paginate_path: "blog/page:num/"
 permalink: blog/:title/
 
