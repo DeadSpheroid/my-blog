@@ -4,8 +4,8 @@ description: Warren Jacinto aka DeadSpheroid's blog for all things code
 url: https://deadspheroid.github.io/my-blog
 # Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
 baseurl: /my-blog
-paginate_path: "blog/page:num/"
-permalink: blog/:title/
+paginate_path: "post/page:num/"
+permalink: post/:title/
 
 # Header Option
 # header: large
