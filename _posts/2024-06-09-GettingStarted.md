@@ -20,7 +20,7 @@ Most modern devices all support OpenCL in some format or the other. Intel/Nvidia
 # Why OpenCL?
 
 <p align="center" width="100%">
-  <img src="/assets/img/cl-cuda.jpeg" alt="OpenCL versus CUDA" style="margin-bottom: 0; margin-top: 24px"> 
+  <img src="{{ site.baseurl }}/assets/img/cl-cuda.jpeg" alt="OpenCL versus CUDA" style="margin-bottom: 0; margin-top: 24px"> 
 </p>
 
 Unlike certain propietary frameworks *cough* CUDA *cough*, OpenCL is not constrained to any particular manufacturer. You can target any GPU/CPU as long as you get the OpenCL implementation for that devices. This is made easy thanks to projects like POCL.
@@ -41,7 +41,7 @@ The first goal for the project was to figure out a way to integrate OpenCL with 
 Gnuastro like many other free software uses the GNU Build System also called GNU Autotools
 
 <p align="center" width="100%">
-  <img src="/assets/img/gnu-logo.png" alt="GNU Autotools" style="margin-bottom: 0; margin-top: 24px"> 
+  <img src="{{ site.baseurl }}/assets/img/gnu-logo.png" alt="GNU Autotools" style="margin-bottom: 0; margin-top: 24px"> 
 </p>
 
 The three major componenets of Autotools are:
