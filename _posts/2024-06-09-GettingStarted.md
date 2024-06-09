@@ -9,7 +9,7 @@ description: Delving into OpenCL, and why it was chosen for Gnuastro, along with
 
 # What is OpenCL?
 <p align="center" width="100%">
-  <img src="/assets/img/opencl-logo.png" alt="OpenCL Logo" style="margin-bottom: 0; margin-top: 24px"> 
+  <img src="{{ site.baseurl }}/assets/img/opencl-logo.png" alt="OpenCL Logo" style="margin-bottom: 0; margin-top: 24px"> 
 </p>
 Open Computing Language is a framework for writing programs that execute across heterogenous platforms. In simpler terms, OpenCL provides a standard interface for programmers to execute the same code across multiple devices, be it a CPU or a GPU or any other accelerator.
 
