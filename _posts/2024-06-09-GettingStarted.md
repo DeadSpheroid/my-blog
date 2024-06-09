@@ -5,7 +5,7 @@ date:   2024-06-09
 description: Delving into OpenCL, and why it was chosen for Gnuastro, along with its integration into the build system.
 ---
 
-<p class="intro"><span class="dropcap">I</span>n this post, I hope to summarize the work done so far towards my GSoC project for integrating OpenCL with the Gnuastro library and my relatively limited understanding of OpenCL.</p>
+<p class="intro">In this post, I hope to summarize the work done so far towards my GSoC project for integrating OpenCL with the Gnuastro library and my relatively limited understanding of OpenCL.</p>
 
 # What is OpenCL?
 <p align="center" width="100%">
