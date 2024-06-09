@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "OpenCL, meet the Gnuastro Build System"
-date:   2024-06-09
+date:   2024-06-09 08:30 +0530
 description: Delving into OpenCL, and why it was chosen for Gnuastro, along with its integration into the build system.
 ---
 
