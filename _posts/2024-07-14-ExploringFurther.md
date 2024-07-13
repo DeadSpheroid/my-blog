@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Exploring OpenCL memory management"
-date:   2024-07-14 00:01 +0530
+date:   2024-07-14 04:00 +0530
 description: Understanding OpenCL memory systems and their comparison
 ---
 
