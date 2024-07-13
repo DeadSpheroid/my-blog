@@ -144,7 +144,7 @@ For example, you load an image into CPU RAM, but actually want to work with it o
 So, you end up copying the image into GPU RAM. In the end, you process the same data twice, once while loading and once while copying
 
 For small images(2000 x 2000) this is barely noticeable
-But gnuastro, and the people using gnuastro deal with astronomica images of incredibly large sizes(ive heard 30GB just for one image).
+But gnuastro, and the people using gnuastro deal with astronomical images of incredibly large sizes(i've heard 30GB just for one image).
 
 So, most certainly, any time you save by using parallelised processing on the GPU, is lost and maybe even worsened by the data transfer times.
 Then, using the GPU is almost pointless, unless you use the same data over and over again
