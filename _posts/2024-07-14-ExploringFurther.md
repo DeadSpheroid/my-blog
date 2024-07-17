@@ -15,7 +15,7 @@ Now, at the heart of C, we have pointers, without them well, you can't really ge
 
 So what would happen if you try to pass a CPU Pointer to the GPU?
 Well, of course, it wont work, the GPU simply segfaults, as it cannot understand the pointer given to it.
-But we still need to use pointers, we can't just abandon them. So how do we do this?
+But we still need to use **pointers**, we can't just abandon them. So how do we do this?
 
 # Buffers
 
