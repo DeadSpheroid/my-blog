@@ -108,4 +108,4 @@ convolution(
 
 ```
 # A new outlook
-Of course, the world would be a lovely place if everything could be parallelised as easily as this. But realistically, parallelizing these operations is hard, but you have tools like local groups, barriers, etc to help you out!
+Of course, the world would be a lovely place if everything could be parallelised as easily as this. Realistically, parallelizing these operations is hard, but you have tools like local groups, barriers, etc to help you out!
