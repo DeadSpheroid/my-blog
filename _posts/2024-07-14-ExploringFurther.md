@@ -11,7 +11,7 @@ description: Understanding OpenCL memory systems and their comparison
 Firstly, its important to have a basic understanding of the hardware involved. Keeping it simple, each OpenCL device represents a different set of hardware, each with its own RAM.
 My own laptop has a 16GB CPU RAM, and 6GB VRAM
 
-Now, at the heart of C, we have pointers, without them well, you can't really get much done in C. The pointers we convetionally use are pointers to CPU RAM.
+Now, at the heart of C, we have pointers, without them well, you can't really get much done in C. The pointers we conventionally use are pointers to CPU RAM.
 
 So what would happen if you try to pass a CPU Pointer to the GPU?
 Well, of course, it wont work, the GPU simply segfaults, as it cannot understand the pointer given to it.
