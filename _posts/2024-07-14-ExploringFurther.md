@@ -151,7 +151,7 @@ Then, using the GPU is almost pointless, unless you use the same data over and o
 
 "Well, cant I just load the data on the GPU directly?"
 Thats not possible, atleast not to my knowledge. This is the tradeoff with GPUs.
-On a CPU, you have 4/8/16 highly specialised and capable cores(math, I/O), while on the GPU you have 1000s of some very primitive math operations(only math, no I/O)
+On a CPU, you have 4/8/16 highly specialised and capable cores(math, I/O), while on the GPU you have 1000s of some very primitive cores only capable of basic operations(only math, no I/O)
 So you always have to load it into CPU RAM first and then go to GPU RAM.
 
 So how can we fix this problem?
@@ -159,5 +159,5 @@ Well, one of the options is to use Shared Virtual Memory(OpenCL SVM), which enab
 
 However, I still have yet to test SVM in the context of gnuastro, to see if its useful.
 Besides, SVM also fixes the problem of structs containing pointers(for another post).
-Documentation for OpenCL is already sparse, and to add insult to injury, documentation on OpenCL SVM is even more sparse.
+Documentation for OpenCL is already scarce, and to add insult to injury, documentation on OpenCL SVM is even more scarce.
 But I like the challenge...
