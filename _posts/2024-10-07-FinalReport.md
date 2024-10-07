@@ -74,7 +74,7 @@ This is one of the biggest overheads in GPU Programming. Additionally, OpenCL pr
 So, this module provides two ways of transferring data to the GPU
 1. OpenCL Buffers
 and
-2. OpenCL SVM
+2. OpenCL Shared Virtual Memory
 
 Buffers are intended to be used for simple data structures, while OpenCL SVM is better with more complex data structures involving internal pointers.
 
@@ -98,6 +98,8 @@ void
 gal_cl_map_svm_to_cpu (cl_context context, cl_command_queue command_queue, 
                 void *svm_ptr, size_t size);
 ```
+
+The main advantage of using OpenCL SVM, is it allows the CPU host process and the GPU process to share the same virtual address space, which greatly simplifies the user's experience. Hence going forward, this was chose as the primary method of achieving data transfer
 
 For more information on the two, and a comparison see [here](https://deadspheroid.github.io/my-blog/post/ExploringFurther/)
 
@@ -126,71 +128,7 @@ typedef struct clprm
 } clprm;
 ```
 
-These wrappers were not developed all at once, but rather in conjunction with the next section, writing wrappers as and when I needed them.
-
-## Parallelized Subroutines
-To achieve the goal of GPU acceleration, first we needed to identify parts of the library that could be parallelized.
-Its important to note that not everything can be parallelized, and just because something can be, doesnt mean it should be.
-
-The most obvious candidate for this of course was 2D Image Convolution, already implemented in Gnuastro in the `astconvolve` module.
-
-#### Same code on CPU and GPU
-The initial idea was to have the exact same code running on both the CPU(via pthread) and the GPU(via OpenCL). This is possible because OpenCL Kernels are based on OpenCL C which is a variant(kind of a subset) of C99.
-
-This is because Gnuastro is a "minimal dependencies" package and having two separate implementations would greatly overcomplicate the codebase.
-
-However for the time being, this idea was shelved, till I had a working implementation of convolution in OpenCL.
-
-#### Convolution
-I got to work creating a new module `cl-convolve.c` containing the new implementation of convolution `gal_convolve_cl()`
-
-The exact code can be viewed [here](https://github.com/DeadSpheroid/gnuastro/blob/final/lib/cl-convolve.c), but in short
-1. Transfer input, kernel and output images to GPU
-2. Spin off a thread for each pixel in the input, convolving that particular pixel.
-3. Copy the output image back to CPU
-
-#### Additional features
-However, Gnuastro doesn't use a **simple 2D convolution**, it also performs an additional three important tasks:
-1. **Edge Correction:** Pixels near the edge use a different kernel weight than others. More info [here](https://www.gnu.org/savannah-checkouts/gnu/gnuastro/manual/html_node/Edges-in-the-spatial-domain.html)
-2. **NAN Checking:** Often, images captured by astronomical cameras, have missing pixels(represented as NANs). These pixels are to be ignored.
-3. **Channels:** Cameras use multiple different sensors to capture images, and convolution should not mix pixels from different sensors. For a better idea, read [Gnuastro's explanation](https://www.gnu.org/savannah-checkouts/gnu/gnuastro/manual/html_node/Tessellation.html)
-
-The first two were rather easy to implement, but the third was a bit troublesome, especially because the existing implementation of gnuastro was complex and hard to understand.
-
-Eventually however, with a little bit of math it was possible, and the final kernel looked like [this](https://github.com/DeadSpheroid/gnuastro/blob/4442a544db5d33d64290ac0b15a97bd627ad6335/bin/convolve/astconvolve-conv.cl)
-
-After these parts were completed, now, all that was left was to actually integrate it properly with Gnuastro.
-
-#### Optimised Convolution
-The power of GPUs comes not from the many threads that are launched, but rather from the many optimisations possible, from organising threads into blocks, to special kinds of memory. I decided to try optimising Convolution based on Labeeb's suggestion of using shared memory.
-
-However most of the optimisation out there are for CUDA, not OpenCL, but the principles in question were the same. Thanks to [this article](https://www.evl.uic.edu/sjames/cs525/final.html), I was able to implement an optimised 2Dconvolution kernel in OpenCL.
-
-The results of the optimisation were surprisingly positive:
-For a 5000 x 5000 image, times recorded for the convolution operation(excluding data reading/writing in seconds were)
-
-| |Pthread|OpenCL-CPU|OpenCL-GPU|
-|:-------|:--------:|:-------:|:------:|
-|w/out optimisations|1.014374|0.918015|**0.025869**|
-|w/ optimisations|1.053622|0.326756|**0.004184**|
-
-Thats a speedup of **~6.2 times** over the non optimised GPU run, and **~242 times** over the existing pthread implementation in Gnuastro!
-
-Further optimisations are possible using special native functions like MUL24 and constant memory. But the details of those and how these optimisation work is a topic for a separate post.
-
-#### Revisiting Same Code on CPU vs GPU
-After a discussion, it was decided that the best path forward for OpenCL in Gnuastro would be to completely replace the existing pthread implementation.
-
-In essence, the existing "convoluted" convolution implementation would be replaced with my new one, allowing the same code to be ran in 3 different ways:
-- With OpenCL on the GPU
-- With OpenCL on the CPU
-- With GCC+Pthreads on the CPU
-
-This decision was made to adhere to the Gnuastro philosophy of "Minimal Dependencies" so the user does not have to install many packages just to use the library.
-
-It was challenging, owing to the different styles in which we write code for a CPU device versus a GPU device. But I managed to get a partially working version using some C macros here and there to do so. It still fails some Gnuastro tests, which is yet to be resolved.
-
-However, doing so prevents the library from utilising the full power of GPUs with several GPU specific optimisations seen previously.
+These wrappers were not developed all at once, but rather in conjunction with the convolution implementation, writing wrappers as and when I needed them.
 
 #### Using the OpenCL modules in your program
 Finally, when a user wants to use Gnuastro's OpenCL capabilities within their own programs, the flow followed would look like:
@@ -299,7 +237,7 @@ Make use of the `clprm` struct defined in `gnuastro/cl-utils.h` to group all the
 `Work Dim` is the number of dimensions of the threads (1, 2, 3)
 For example, an array would have 1 dimension(0,1,2,...34,35,36) x
 an image would have 2 dimensions(0:0, 0:1, 1:0, 1:1,....) x:y
-a volume would have 3 dimensions.
+a volume would have 3 dimensions x:y:z
 
 `Global Work Size` is the total number of threads spun off
 
@@ -341,11 +279,73 @@ gal_cl_read_data_to_cpu(context, command_queue, output_image_gpu);
 
 The complete program can be accessed [here](https://github.com/DeadSpheroid/gnuastro/blob/final/cl-example-add-fits.c)
 
+## Parallelized Subroutines
+To achieve the goal of GPU acceleration, first we needed to identify parts of the library that could be parallelized.
+Its important to note that not everything can be parallelized, and just because something can be, doesnt mean it should be.
+
+The most obvious candidate for this of course was 2D Image Convolution, already implemented in Gnuastro in the `astconvolve` module.
+
+
+#### Convolution
+I got to work creating a new module `cl-convolve.c` containing the new implementation of convolution `gal_convolve_cl()`
+
+The exact code can be viewed [here](https://github.com/DeadSpheroid/gnuastro/blob/final/lib/cl-convolve.c), but in short:
+1. Transfer input, kernel and output images to GPU
+2. Spin off a thread for each pixel in the input, convolving that particular pixel.
+3. Copy the output image back to CPU
+
+After integrating the OpenCL wrappers with astconvolve, the new interface looks like this
+
+<p align="center" width="100%">
+  <img src="{{ site.baseurl }}/assets/img/cl_opt.png" alt="--cl option on CLI" style="margin-bottom: 0; margin-top: 24px"> 
+</p>
+
+Note the new `--cl=INT` option, which is a CLI argument allowing users to choose the implementation they want and the device they want.
+
+- --cl=0 corresponds to existing pthread implementation on CPU
+- --cl=1 corresponds to OpenCL implementation on GPU
+- --cl=2 corresponds to OpenCL implementaion on CPU
+
+Leaving this parameter blank, defaults to the pthread implementation, making GPU acceleration opt-in, owing to the minute floating point differences that can occur. 
+
+#### Optimised Convolution
+The power of GPUs comes not from the many threads that are launched, but rather from the many optimisations possible, from organising threads into blocks, to special kinds of memory. I decided to try optimising Convolution based on Labeeb's suggestion of using shared memory.
+
+However most of the optimisation out there are for CUDA, not OpenCL, but the principles in question were the same. Thanks to [this article](https://www.evl.uic.edu/sjames/cs525/final.html), I was able to implement an optimised 2Dconvolution kernel in OpenCL.
+
+The results of the optimisation were surprisingly positive:
+For a 5000 x 5000 image, times recorded for the convolution operation(excluding data reading/writing in seconds were)
+
+| |Pthread|OpenCL-CPU|OpenCL-GPU|
+|:-------|:--------:|:-------:|:------:|
+|w/out optimisations|1.014374|0.918015|**0.025869**|
+|w/ optimisations|1.053622|0.326756|**0.004184**|
+
+Thats a speedup of **~6.2 times** over the non optimised GPU run, and **~242 times** over the existing pthread implementation in Gnuastro!
+
+Further optimisations are possible using special native functions like MUL24 and constant memory. But the details of those and how these optimisation work is a topic for a separate post.
+
+#### Same code on CPU and GPU
+The initial idea was to have the exact same code running on both the CPU(via pthread) and the GPU(via OpenCL). This is possible because OpenCL Kernels are based on OpenCL C which is a variant(kind of a subset) of C99.
+
+This is because Gnuastro is a "minimal dependencies" package and having two separate implementations would greatly overcomplicate the codebase.
+
+After a discussion, it was decided that the best path forward for OpenCL in Gnuastro would be to completely replace the existing pthread implementation.
+
+In essence, the existing "convoluted" convolution implementation would be replaced with my new one, allowing the same code to be ran in 3 different ways:
+- With OpenCL on the GPU
+- With OpenCL on the CPU
+- With GCC+Pthreads on the CPU
+
+
+It was challenging, owing to the different styles in which we write code for a CPU device versus a GPU device. But I managed to get a partially working version using some C macros here and there to do so. It still fails some Gnuastro tests, which is yet to be resolved.
+
+
 # Post GSoC
 Now, that the wrapper infrastructure is set up and convolution is implemented, whats left is to test the implementation against real life scenarios to make sure it lives up to the expectations of the Gnuastro users.
 We also need to come up with a consistent way to execute the same kernel on both OpenCL and GCC, as mentioned earlier.
 
-Additionally, now that work on one module is complete, it opens the scope for more modules to be implemented on the GPU (like statistics, interpolation and more)
+Additionally, now that work on one module is complete, it opens the scope for more modules to be implemented on the GPU (like statistics, interpolation and more).
 
 # Acknowledgements
 GSoC has been an incredible learning experience for me both from a technical view and from a personal view.
