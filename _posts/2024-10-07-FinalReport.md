@@ -79,7 +79,7 @@ and
 Buffers are intended to be used for simple data structures, while OpenCL SVM is better with more complex data structures involving internal pointers.
 
 The interface looks something like this
-```C
+{%- highlight C -%}
 void
 gal_cl_write_to_device (cl_mem *buffer, void *mapped_ptr,
                              cl_command_queue command_queue);
@@ -97,7 +97,7 @@ gal_cl_alloc_svm (size_t size_of_array, size_t size_of_dsize,
 void
 gal_cl_map_svm_to_cpu (cl_context context, cl_command_queue command_queue, 
                 void *svm_ptr, size_t size);
-```
+{%- endhighlight -%}
 
 The main advantage of using OpenCL SVM, is it allows the CPU host process and the GPU process to share the same virtual address space, which greatly simplifies the user's experience. Hence going forward, this was chose as the primary method of achieving data transfer
 
@@ -108,7 +108,7 @@ Now, the main code running on the GPU is the OpenCL Kernel, usually defined in a
 
 The idea when making this module, was to keep the interface as similar to the original pthreads `gal_threads_spin_off()` interface that Gnuastro already had. So i created a `gal_cl_threads_spinoff()` function, taking information like the kernel filepath, number of inputs, list of inputs, number of threads executed and more.
 
-```C
+{%- highlight C -%}
 typedef struct clprm
 {
   char               *kernel_path; /* Path to kernel.cl file */
@@ -126,7 +126,7 @@ typedef struct clprm
   size_t        *global_work_size; /* Array of global sizes of size work_dim */
   size_t         *local_work_size; /* Array of local sizes of size work_dim */
 } clprm;
-```
+{%- endhighlight -%}
 
 These wrappers were not developed all at once, but rather in conjunction with the convolution implementation, writing wrappers as and when I needed them.
 
@@ -141,7 +141,7 @@ Finally, when a user wants to use Gnuastro's OpenCL capabilities within their ow
 Lets take an example where we need to simply add two fits images.
 
 ##### Initialize OpenCl
-```C
+{%- highlight C -%}
   cl_context context;
   cl_platform_id platform_id;
   cl_device_id device_id;
@@ -149,13 +149,14 @@ Lets take an example where we need to simply add two fits images.
   gal_cl_init (CL_DEVICE_TYPE_GPU, &context, &platform_id, &device_id);
   cl_command_queue command_queue
       = gal_cl_create_command_queue (context, device_id);
-```
+{%- endhighlight -%}
+
 This initializes and OpenCL context, among other objects for use in future function calls.
 
 ##### Transfer Input to Device
 Make use of `gal_cl_copy_data_to_gpu()` to transfer the loaded fits files to the GPU, passing the previously initialized context and command queue. Make sure the command queue finishes before proceeding ahead through `gal_cl_finish_queue()`
 
-```C
+{%- highlight C -%}
   gal_data_t *input_image1_gpu
       = gal_cl_copy_data_to_gpu (context, command_queue, input_image1);
   gal_data_t *input_image2_gpu
@@ -164,7 +165,7 @@ Make use of `gal_cl_copy_data_to_gpu()` to transfer the loaded fits files to the
       = gal_cl_copy_data_to_gpu (context, command_queue, output_image);
 
   gal_cl_finish_queue (command_queue);
-```
+{%- endhighlight -%}
 
 ##### Write an OpenCL Kernel
 First, any custom structs you use, must be defined in the kernel, here we define gal_data_t.
@@ -179,7 +180,7 @@ Perform the core operation of your program.
 
 Putting it all together, it looks like this:
 
-```C
+{%- highlight C -%}
 typedef struct  __attribute__((aligned(4))) gal_data_t
 {
   /* Basic information on array of data. */
@@ -210,7 +211,7 @@ add(__global gal_data_t *input_image1,
     output_array[id] = input_array1[id] + input_array2[id];
     return;
 }
-```
+{%- endhighlight -%}
 
 
 ##### Spin Off Threads
@@ -243,8 +244,7 @@ a volume would have 3 dimensions x:y:z
 
 `Local Work Size` is the number of threads in a block on one GPU core. Leaving it blank lets the device choose this number.
 
-```C
-
+{%- highlight C -%}
   clprm *sprm = (clprm *)malloc (sizeof (clprm));
 
   void *kernel_args[] = { (void *)input_image1_gpu, (void *)input_image2_gpu,
@@ -271,11 +271,12 @@ a volume would have 3 dimensions x:y:z
   sprm->local_work_size = NULL;
 
   gal_cl_finish_queue (command_queue);
-```
+{%- endhighlight -%}
 ##### Copy Output back to Host
-```C
+
+{%- highlight C -%}
 gal_cl_read_data_to_cpu(context, command_queue, output_image_gpu);
-```
+{%- endhighlight -%}
 
 The complete program can be accessed [here](https://github.com/DeadSpheroid/gnuastro/blob/final/cl-example-add-fits.c)
 
@@ -337,9 +338,7 @@ In essence, the existing "convoluted" convolution implementation would be replac
 - With OpenCL on the CPU
 - With GCC+Pthreads on the CPU
 
-
 It was challenging, owing to the different styles in which we write code for a CPU device versus a GPU device. But I managed to get a partially working version using some C macros here and there to do so. It still fails some Gnuastro tests, which is yet to be resolved.
-
 
 # Post GSoC
 Now, that the wrapper infrastructure is set up and convolution is implemented, whats left is to test the implementation against real life scenarios to make sure it lives up to the expectations of the Gnuastro users.
